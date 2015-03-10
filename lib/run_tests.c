@@ -85,11 +85,10 @@ int main()
 
     if (exit_code == 0) {
         puts("Test passed");
+        unlink(TMP_FILENAME);
     } else {
-        puts("Test failed");
+        puts("Test failed see the " TMP_FILENAME);
     }
-
-    unlink(TMP_FILENAME);
 
     return exit_code;
 
