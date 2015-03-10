@@ -1,0 +1,5 @@
+cat
+.actual
+.buffer
+.expected
+.depend
