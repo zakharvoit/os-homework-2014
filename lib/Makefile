@@ -24,7 +24,7 @@ test: $(TEST)
 $(TEST): $(TEST).c $(LIBRARY)
 	$(CC) $(TEST_CFLAGS) -o $@ $^
 
-include .depend
+-include .depend
 
 clean:
 	-rm -f $(LIBRARY) $(OBJ)
