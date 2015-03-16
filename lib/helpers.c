@@ -43,3 +43,33 @@ ssize_t write_(int fd,
 
     return already_wrote;
 }
+
+ssize_t read_until(int fd,
+                   void* buf,
+                   size_t count,
+                   char delimiter)
+{
+    size_t already_read = 0;
+    size_t i = 0;
+
+    while (already_read < count) {
+        int new = read(fd, 
+                       (char*) buf + already_read, 
+                       count - already_read);
+
+        if (new < 0) {
+            return -1;
+        } else if (new == 0) {
+            return already_read;
+        } else {
+            already_read += new;
+            for (; i < already_read; i++) {
+                if (*((char*) buf + i) == delimiter) {
+                    return already_read;
+                }
+            }
+        }
+    }
+
+    return already_read;
+}
