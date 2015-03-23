@@ -1,9 +1,11 @@
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <helpers.h>
 
-#define BUFFER_SIZE 8192
+#define BUFFER_SIZE 10000
+#define MIDDLE (BUFFER_SIZE >> 1)
 
 void swap(char* a, char* b)
 {
@@ -20,43 +22,59 @@ void reverse(char* begin, char* end)
     }
 }
 
-int output_reversed(char* buffer, ssize_t last_i, ssize_t i)
+char* revwords(char* begin, char* end)
 {
-    reverse(buffer + last_i + (last_i != 0), buffer + i);
-    if (write_(STDOUT_FILENO,
-               buffer + last_i,
-               i - last_i) < 0) {
-        return -1;
+    char* next_space = begin - 1;
+
+    for (; begin < end; begin = next_space + 1) {
+        next_space = begin;
+        while (next_space < end
+               && *next_space != ' ') {
+            next_space++;
+        }
+
+        if (next_space == end) {
+            break;
+        }
+
+        reverse(begin, next_space);
+        if (write_(STDOUT_FILENO,
+                   begin, next_space - begin + 1) < 0) {
+            return NULL;
+        }
     }
-    return 0;
+
+    return begin;
 }
 
 int main()
 {
     char buffer[BUFFER_SIZE];
-    ssize_t i, last_i;
+    char* last_word = buffer + MIDDLE;
     ssize_t count;
 
     while ((count = read_until(STDIN_FILENO,
-                               buffer,
-                               BUFFER_SIZE,
-                               ' ')) != 0) {
+                               buffer + MIDDLE,
+                               MIDDLE, ' ')) != 0) {
+
         if (count < 0) {
             goto ERROR;
         }
 
-        last_i = 0;
-        for (i = 0; i < count; i++) {
-            if (buffer[i] == ' ') {
-                if (output_reversed(buffer, last_i, i) < 0) {
-                    goto ERROR;
-                }
-                last_i = i;
-            }
-        }
-        if (output_reversed(buffer, last_i, i) < 0) {
+        if ((last_word = revwords(last_word,
+                                  buffer + MIDDLE + count)) == NULL) {
+
             goto ERROR;
         }
+
+        last_word -= count;
+
+        memcpy(buffer + MIDDLE - count, buffer + MIDDLE, count);
+    }
+
+    reverse(last_word, buffer + MIDDLE);
+    if (write_(STDOUT_FILENO, last_word, buffer - last_word + MIDDLE) < 0) {
+        goto ERROR;
     }
 
     return EXIT_SUCCESS;
