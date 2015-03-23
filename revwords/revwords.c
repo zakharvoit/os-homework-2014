@@ -50,11 +50,12 @@ char* revwords(char* begin, char* end)
 int main()
 {
     char buffer[BUFFER_SIZE];
-    char* last_word = buffer + MIDDLE;
+    char* middle_buffer = buffer + MIDDLE;
+    char* last_word = middle_buffer;
     ssize_t count;
 
     while ((count = read_until(STDIN_FILENO,
-                               buffer + MIDDLE,
+                               middle_buffer,
                                MIDDLE, ' ')) != 0) {
 
         if (count < 0) {
@@ -62,24 +63,23 @@ int main()
         }
 
         if ((last_word = revwords(last_word,
-                                  buffer + MIDDLE + count)) == NULL) {
-
+                                  middle_buffer + count)) == NULL) {
             goto ERROR;
         }
 
-        last_word -= count;
-
-        memcpy(buffer + MIDDLE - count, buffer + MIDDLE, count);
+        count = middle_buffer + count - last_word;
+        memmove(middle_buffer - count, last_word, count);
+        last_word = middle_buffer - count;
     }
 
-    reverse(last_word, buffer + MIDDLE);
+    reverse(last_word, middle_buffer);
     if (write_(STDOUT_FILENO, last_word, buffer - last_word + MIDDLE) < 0) {
         goto ERROR;
     }
 
     return EXIT_SUCCESS;
 
-ERROR:
+ ERROR:
     perror("I/O error");
     return EXIT_FAILURE;
 }
