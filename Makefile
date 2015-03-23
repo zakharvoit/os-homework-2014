@@ -1,4 +1,4 @@
-SUBMODULES = lib cat
+SUBMODULES = lib cat lenwords
 
 SUBMODULES_RULE = $(SUBMODULES:%=%.submodule)
 
