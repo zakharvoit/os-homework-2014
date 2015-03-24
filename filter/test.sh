@@ -15,8 +15,7 @@ for pred in true false ./is_size_even.sh "./grep_quiet.sh -i aa" cat 'wc -l' ; d
     # echo for unquoting
     ./filter `echo -n $pred` <.list >.actual
     perl -nE 'BEGIN {$c.=" $_" while($_ = shift) } chomp; say if system("$c $_ 2>/dev/null") == 0' $pred <.list >.expected
-    perl -i -ne 'print if $_ ne "\n"' .actual
-    perl -i -ne 'print if $_ ne "\n"' .expected
+    perl -i -ne 'print if $_ ne "\n"' .actual .expected
     cmp .expected .actual
     if [[ $? = 0 ]] ; then
         echo "OK $pred"
