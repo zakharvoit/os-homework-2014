@@ -9,7 +9,15 @@ for i in `seq 1 100`; do
     echo -n "$i "
 done
 echo "Done!"
-for pred in true false ./is_size_even.sh "./grep_quiet.sh -i aa" cat 'wc -l' ; do
+
+for pred in true \
+            false \
+            ./is_size_even.sh \
+            "./grep_quiet.sh -i aa" \
+            cat 'wc -l' \
+            "`(for a in $(seq 1 10000) ; do echo $a ; done) | xargs echo`"
+                ; do
+
     echo "Testing predicate $pred"
     echo "Running tests"
     # echo for unquoting
