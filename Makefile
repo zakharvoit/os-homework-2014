@@ -1,4 +1,4 @@
-SUBMODULES = lib cat revwords
+SUBMODULES = lib cat revwords filter
 
 SUBMODULES_RULE = $(SUBMODULES:%=%.submodule)
 
