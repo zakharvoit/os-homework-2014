@@ -7,12 +7,12 @@
 
 #define BUFFER_SIZE 10000
 #define MIDDLE (BUFFER_SIZE >> 1)
-#define MAX_ARGV_LENGTH 256
 
 struct process_data_t
 {
     char* file;
-    char* argv[MAX_ARGV_LENGTH];
+    char** argv;
+    int max_length;
 };
 
 typedef int(*string_processer_t)(char* buffer, void* data);
@@ -81,10 +81,10 @@ int for_each_line(const string_processer_t callback,
 int filter(char* buffer, void* data)
 {
     struct process_data_t* process = (struct process_data_t*) data;
-    char* argv[MAX_ARGV_LENGTH];
     char local_buffer[BUFFER_SIZE];
-    size_t null_pos = 0;
+    int null_pos = 0;
     size_t buffer_len = strlen(buffer);
+    int result = 0;
 
 #ifndef RUN_ON_EMPTY
     if (buffer_len == 0) {
@@ -96,48 +96,63 @@ int filter(char* buffer, void* data)
     local_buffer[buffer_len] = '\n';
     local_buffer[buffer_len + 1] = 0;
 
-    memcpy(argv, process->argv, sizeof(argv));
-    while (null_pos < MAX_ARGV_LENGTH && argv[null_pos] != NULL) {
+    while (null_pos < process->max_length
+           && process->argv[null_pos] != NULL) {
+
         null_pos++;
     }
 
-    if (null_pos >= MAX_ARGV_LENGTH - 1) {
+    if (null_pos >= process->max_length - 1) {
         errno = E2BIG;
-        return -1;
+        result = -1;
+        goto EXIT;
     }
 
-    argv[null_pos] = buffer;
-    argv[null_pos + 1] = NULL;
+    process->argv[null_pos] = buffer;
+    process->argv[null_pos + 1] = NULL;
 
-    if (spawn(process->file, argv) == 0) {
+    if (spawn(process->file, process->argv) == 0) {
         if (write_(STDOUT_FILENO, local_buffer, buffer_len + 1) < 0) {
-            return -1;
+            result = -1;
+            goto EXIT;
         }
     }
 
-    return 0;
+ EXIT:
+    process->argv[null_pos] = NULL;
+
+    return result;
 }
 
 int main(int argc,
          char* argv[])
 {
     struct process_data_t data;
+    char* argv_copy[argc + 1];
+    int i;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: ./filter <program> <arg0> <arg1> ... <argN>\n");
         return EXIT_FAILURE;
     }
 
+    for (i = 0; i < argc - 1; i++) {
+        argv_copy[i] = argv[i + 1];
+    }
+
+    argv_copy[argc - 1] = NULL;
+
     data.file = argv[1];
-    memcpy(data.argv,
-           argv + 1,
-           (argc - 1) * sizeof(char*));
-    data.argv[argc - 1] = NULL;
+    data.argv = argv_copy;
+    data.max_length = argc + 1;
 
     if (for_each_line(&filter, (void*) &data) < 0) {
-        perror("I/O error");
-        return EXIT_FAILURE;
+        goto ERROR;
     }
 
     return EXIT_SUCCESS;
+
+ ERROR:
+    perror("error");
+    return EXIT_FAILURE;
 }
