@@ -1,4 +1,8 @@
+ifeq ($(TARGET), debug)
+CFLAGS = -fPIC -O0 -g -Wall -Wextra
+else
 CFLAGS = -fPIC -O2 -Wall -Wextra
+endif
 
 LIBRARY = libhelpers.so
 OBJ = helpers.o
