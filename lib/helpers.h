@@ -16,4 +16,7 @@ ssize_t read_until(int fd,
                    size_t count,
                    char delimiter);
 
+int spawn(const char* file,
+          char* const argv[]);
+
 #endif 

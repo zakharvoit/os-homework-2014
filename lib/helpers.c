@@ -1,5 +1,8 @@
 #include "helpers.h"
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 ssize_t read_(int fd,
               void* buf,
               size_t count)
@@ -72,4 +75,32 @@ ssize_t read_until(int fd,
     }
 
     return already_read;
+}
+
+int spawn(const char* file,
+          char* const argv[])
+{
+    pid_t child;
+    int status;
+
+    if ((child = fork())) {
+        if (child == -1) {
+            return -1;
+        }
+
+        if (waitpid(child, &status, 0) < 0) {
+            return -1;
+        }
+
+        if (status != 0) {
+            return -1;
+        }
+    } else {
+        if (execvp(file, argv) < 0) {
+            _exit(-1);
+        }
+        _exit(0);
+    }
+
+    return 0;
 }
