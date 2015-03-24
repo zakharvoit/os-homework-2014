@@ -14,6 +14,9 @@ SRC = $(OBJ:%.o=%.c)
 
 all: depend $(OUTPUT)
 
+test:
+	./test.sh
+
 $(OUTPUT): $(OBJ)
 
 depend: .depend

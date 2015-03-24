@@ -82,7 +82,19 @@ int filter(char* buffer, void* data)
 {
     struct process_data_t* process = (struct process_data_t*) data;
     char* argv[MAX_ARGV_LENGTH];
+    char local_buffer[BUFFER_SIZE];
     size_t null_pos = 0;
+    size_t buffer_len = strlen(buffer);
+
+#ifndef RUN_ON_EMPTY
+    if (buffer_len == 0) {
+        return 0;
+    }
+#endif
+
+    memcpy(local_buffer, buffer, buffer_len + 1);
+    local_buffer[buffer_len] = '\n';
+    local_buffer[buffer_len + 1] = 0;
 
     memcpy(argv, process->argv, sizeof(argv));
     while (null_pos < MAX_ARGV_LENGTH && argv[null_pos] != NULL) {
@@ -98,7 +110,7 @@ int filter(char* buffer, void* data)
     argv[null_pos + 1] = NULL;
 
     if (spawn(process->file, argv) == 0) {
-        if (write_(STDOUT_FILENO, buffer, strlen(buffer)) < 0) {
+        if (write_(STDOUT_FILENO, local_buffer, buffer_len + 1) < 0) {
             return -1;
         }
     }
