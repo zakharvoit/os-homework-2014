@@ -1,7 +1,7 @@
 LIBHELPERS_PATH = ../lib
 
 ifeq ($(TARGET), debug)
-CFLAGS = -g -O0 -DRUN_ON_EMPTY -D_GLIBC_DEBUG -Wall -Wextra -I$(LIBHELPERS_PATH)
+CFLAGS = -DRUN_ON_EMPTY -g -O0 -D_GLIBC_DEBUG -Wall -Wextra -I$(LIBHELPERS_PATH)
 else
 CFLAGS = -DRUN_ON_EMPTY -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
 endif
