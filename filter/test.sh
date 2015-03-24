@@ -1,4 +1,3 @@
-#!/bin/zsh
 #!/usr/bin/env bash
 
 rm -f .list
@@ -16,7 +15,7 @@ for pred in true \
             "./grep_quiet.sh -i aa" \
             cat 'wc -l' \
             "echo `(for a in $(seq 1 300) ; do echo $a ; done) | xargs echo -n`"
-                ; do
+                do
 
     if [[ ${#pred} -lt 300 ]] ; then
         pred_name="$pred"
