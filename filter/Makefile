@@ -1,9 +1,9 @@
 LIBHELPERS_PATH = ../lib
 
 ifeq ($(TARGET), debug)
-CFLAGS = -g -O0 -D_GLIBC_DEBUG -Wall -Wextra -I$(LIBHELPERS_PATH)
+CFLAGS = -g -O0 -DRUN_ON_EMPTY -D_GLIBC_DEBUG -Wall -Wextra -I$(LIBHELPERS_PATH)
 else
-CFLAGS = -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
+CFLAGS = -DRUN_ON_EMPTY -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
 endif
 
 LDFLAGS = -lhelpers -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH)
