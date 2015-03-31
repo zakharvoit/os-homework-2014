@@ -1,38 +1,30 @@
-ifeq ($(TARGET), debug)
-CFLAGS = -fPIC -O0 -g -Wall -Wextra
-else
-CFLAGS = -fPIC -O2 -Wall -Wextra
-endif
+all: libbufio.so libhelpers.so
 
-LIBRARY = libhelpers.so
-OBJ = helpers.o
-SRC = $(OBJ:%.o=%.c)
+MAKE = @make --no-print-directory
+
+BUFIO_SRC = bufio.c
+MAKE_BUFIO = $(MAKE) SRC=$(BUFIO_SRC) NAME=bufio -f make_library.mk
+
+HELPERS_SRC = helpers.c
+MAKE_HELPERS = $(MAKE) SRC=$(HELPERS_SRC) NAME=helpers -f make_library.mk
+
+libbufio.so:
+	$(MAKE_BUFIO)
+
+libhelpers.so:
+	$(MAKE_HELPERS)
 
 TEST = run_tests
 TEST_CFLAGS = $(CFLAGS) -L. -Wl,-rpath=. -lhelpers
 
-all: depend $(LIBRARY)
-
-$(LIBRARY): $(OBJ)
-	$(CC) $(CFLAGS) -shared -o $@ $^
-
-depend: .depend
-
-.depend: $(SRC)
-	-rm -f .depend
-	$(CC) $(CFLAGS) -MM $^ -MF .depend
-
 test: $(TEST)
 	./$(TEST)
 
-$(TEST): $(TEST).c $(LIBRARY)
+$(TEST): $(TEST).c $(HELPERS)
 	$(CC) $(TEST_CFLAGS) -o $@ $^
 
--include .depend
-
 clean:
-	-rm -f $(LIBRARY) $(OBJ)
-	-rm -f $(TEST)
-	-rm -f .depend
+	$(MAKE_BUFIO) clean
+	$(MAKE_HELPERS) clean
 
-.PHONY: all clean depend test
+.PHONY: all clean test libbufio.so libhelpers.so
