@@ -1,16 +1,16 @@
-SUBMODULES = lib cat revwords filter
+SUBMODULES = lib cat revwords filter bufcat
 
 SUBMODULES_RULE = $(SUBMODULES:%=%.submodule)
 
 all: $(SUBMODULES_RULE)
 
 %.submodule:
-	@echo "Making $(@:%.submodule=%)"
+	@echo "=== Making $(@:%.submodule=%) ==="
 	@$(MAKE) --no-print-directory -C $(@:%.submodule=%)
 
 clean:
 	@for dir in $(SUBMODULES) ; do \
-		echo "Cleaning $$dir"; \
+		echo "=== Cleaning $$dir ==="; \
 		$(MAKE) --no-print-directory clean -C $$dir; \
 	done
 
