@@ -4,6 +4,11 @@
 #include <unistd.h>
 #include <string.h>
 
+#ifndef DEBUG
+#define NDEBUG
+#endif
+#include <assert.h>
+
 struct buf_t* buf_new(size_t capacity)
 {
     struct buf_t* buffer = (struct buf_t*) malloc(sizeof(struct buf_t)
@@ -20,16 +25,19 @@ struct buf_t* buf_new(size_t capacity)
 
 void buf_free(struct buf_t* buffer)
 {
+    assert(buffer);
     free(buffer);
 }
 
 size_t buf_capacity(struct buf_t* buffer)
 {
+    assert(buffer);
     return buffer->capacity;
 }
 
 size_t buf_size(struct buf_t* buffer)
 {
+    assert(buffer);
     return buffer->size;
 }
 
@@ -37,6 +45,8 @@ ssize_t buf_fill(int fd,
                  struct buf_t* buf,
                  size_t required)
 {
+    assert(buf && required <= buf->capacity - buf->size);
+
     ssize_t current = 0;
     size_t last_size = buf->size;
 
@@ -60,6 +70,8 @@ ssize_t buf_flush(int fd,
                   struct buf_t* buf,
                   size_t required)
 {
+    assert(buf);
+
     ssize_t current = 0;
     size_t written = 0;
 

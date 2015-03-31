@@ -1,5 +1,5 @@
 ifeq ($(TARGET), debug)
-CFLAGS = -fPIC -O0 -g -Wall -Wextra
+CFLAGS = -DDEBUG -fPIC -O0 -g -Wall -Wextra
 else
 CFLAGS = -fPIC -O2 -Wall -Wextra
 endif
