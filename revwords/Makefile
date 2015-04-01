@@ -1,7 +1,8 @@
 LIBHELPERS_PATH = ../lib
 
 CFLAGS = -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
-LDFLAGS = -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH) -lhelpers 
+LDFLAGS = -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH)
+LDLIBS = -lhelpers
 
 OUTPUT = revwords
 OBJ = revwords.o
