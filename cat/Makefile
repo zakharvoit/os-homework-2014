@@ -1,7 +1,7 @@
 LIBHELPERS_PATH = ../lib
 
 CFLAGS = -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
-LDFLAGS = -lhelpers -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH)
+LDFLAGS =  -L$(LIBHELPERS_PATH) -Wl,-rpath=$(LIBHELPERS_PATH) -lhelpers 
 
 OUTPUT = cat
 OBJ = cat.o

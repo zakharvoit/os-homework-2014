@@ -1,7 +1,7 @@
 LIBBUFIO_PATH = ../lib
 
 CFLAGS = -O2 -Wall -Wextra -I$(LIBBUFIO_PATH)
-LDFLAGS = -lbufio -Wl,-rpath=$(LIBBUFIO_PATH) -L$(LIBBUFIO_PATH)
+LDFLAGS = -L$(LIBBUFIO_PATH)  -Wl,-rpath=$(LIBBUFIO_PATH) -lbufio
 
 OUTPUT = bufcat
 OBJ = bufcat.o

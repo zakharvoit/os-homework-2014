@@ -6,7 +6,7 @@ else
 CFLAGS = -DRUN_ON_EMPTY -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
 endif
 
-LDFLAGS = -lhelpers -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH)
+LDFLAGS = -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH) -lhelpers 
 
 OUTPUT = filter
 OBJ = filter.o
