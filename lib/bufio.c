@@ -94,3 +94,39 @@ ssize_t buf_flush(int fd,
 
     return written;
 }
+
+ssize_t buf_getline(int fd,
+                    struct buf_t* buf,
+                    char* dest)
+{
+    assert(buf);
+
+    ssize_t current = 0;
+    ssize_t new_size = 0;
+    size_t i = 0;
+
+    do {
+        int finished = 0;
+        for (i = 0; i < buf->size; i++) {
+            if (DATA(buf)[i] == '\n') {
+                memcpy(dest + new_size, DATA(buf), i);
+                memmove(DATA(buf), DATA(buf) + i + 1, buf->size - i - 1);
+                buf->size -= i + 1;
+                new_size += i;
+                finished = 1;
+                break;
+            }
+        }
+        if (finished) {
+            break;
+        }
+        if (current < 0) {
+            return -1;
+        }
+        memcpy(dest + new_size, DATA(buf), buf->size);
+        new_size += buf->size;
+        buf->size = 0;
+    } while ((current = buf_fill(fd, buf, 1)));
+
+    return new_size;
+}
