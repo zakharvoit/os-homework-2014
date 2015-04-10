@@ -1,4 +1,4 @@
-SUBMODULES = lib cat revwords filter bufcat
+SUBMODULES = lib cat revwords filter bufcat foreach
 
 SUBMODULES_RULE = $(SUBMODULES:%=%.submodule)
 
