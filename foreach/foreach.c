@@ -25,7 +25,7 @@ int for_each_line(const string_processer_t callback,
     char dest[BUFFER_SIZE];
     struct buf_t* buf = buf_new(BUFFER_SIZE);
     ssize_t size;
-    while ((size = buf_getline(STDIN_FILENO, buf, dest))) {
+    while ((size = buf_getline(STDIN_FILENO, buf, dest, 4096))) {
         if (size < 0) {
             return -1;
         }
@@ -58,7 +58,7 @@ int apply_crazy(char* buffer, void* data)
     local_buffer[buffer_len + 1] = 0;
 
     while (null_pos < process->max_length
-           && process->argv[null_pos] != NULL) {
+            && process->argv[null_pos] != NULL) {
 
         null_pos++;
     }
@@ -79,7 +79,7 @@ int apply_crazy(char* buffer, void* data)
         }
     }
 
- EXIT:
+EXIT:
     process->argv[null_pos] = NULL;
 
     return result;
@@ -113,7 +113,7 @@ int main(int argc,
 
     return EXIT_SUCCESS;
 
- ERROR:
+ERROR:
     perror("error");
     return EXIT_FAILURE;
 }

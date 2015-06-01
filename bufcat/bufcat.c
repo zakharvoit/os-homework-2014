@@ -33,7 +33,7 @@ int main()
 
     return EXIT_SUCCESS;
 
- ERROR:
+ERROR:
     perror("I/O error");
     return EXIT_FAILURE;
 }

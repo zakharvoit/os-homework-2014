@@ -43,7 +43,7 @@ int write_file()
 /**
  * Tests whether read file is the same as the written one
  * Returns: 0 if the files are the same, -1 in case of error, 1 otherwise
- */ 
+ */
 int read_file()
 {
     char read_buffer[FILE_SIZE];
@@ -53,7 +53,7 @@ int read_file()
     if ((fd = open(TMP_FILENAME, O_RDONLY)) < 0) {
         return -1;
     }
-    
+
     if ((count = read(fd, read_buffer, FILE_SIZE)) < 0) {
         return -1;
     }

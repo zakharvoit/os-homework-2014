@@ -19,4 +19,4 @@ ssize_t read_until(int fd,
 int spawn(const char* file,
           char* const argv[]);
 
-#endif 
+#endif

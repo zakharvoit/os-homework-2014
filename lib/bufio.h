@@ -7,9 +7,8 @@ struct buf_t
 {
     size_t capacity;
     size_t size;
+    char data[];
 };
-
-#define DATA(b) ((char*) (b + 1))
 
 struct buf_t* buf_new(size_t capacity);
 void buf_free(struct buf_t* buffer);
@@ -27,6 +26,7 @@ ssize_t buf_flush(int fd,
 
 ssize_t buf_getline(int fd,
                     struct buf_t* buf,
-                    char* dest);
+                    char* dest,
+                    size_t size);
 
 #endif

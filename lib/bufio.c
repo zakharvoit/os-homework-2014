@@ -11,8 +11,7 @@
 
 struct buf_t* buf_new(size_t capacity)
 {
-    struct buf_t* buffer = (struct buf_t*) malloc(sizeof(struct buf_t)
-                                                  + capacity);
+    struct buf_t* buffer = malloc(sizeof(struct buf_t) + capacity);
     if (buffer == NULL) {
         return NULL;
     }
@@ -51,7 +50,7 @@ ssize_t buf_fill(int fd,
     size_t last_size = buf->size;
 
     while ((current = read(fd,
-                          DATA(buf) + buf->size,
+                           buf->data + buf->size,
                            buf->capacity - buf->size))) {
         if (current < 0) {
             buf->size = last_size;
@@ -76,8 +75,8 @@ ssize_t buf_flush(int fd,
     size_t written = 0;
 
     while ((current = write(fd,
-                           DATA(buf) + written,
-                           buf->size - written))) {
+                            buf->data + written,
+                            buf->size - written))) {
         if (current < 0) {
             /* Buffer state undefined ? */
             return -1;
@@ -89,7 +88,7 @@ ssize_t buf_flush(int fd,
         }
     }
 
-    memmove(DATA(buf), DATA(buf) + written, buf->size - written);
+    memmove(buf->data, buf->data + written, buf->size - written);
     buf->size -= written;
 
     return written;
@@ -97,7 +96,8 @@ ssize_t buf_flush(int fd,
 
 ssize_t buf_getline(int fd,
                     struct buf_t* buf,
-                    char* dest)
+                    char* dest,
+                    size_t size)
 {
     assert(buf);
 
@@ -108,9 +108,12 @@ ssize_t buf_getline(int fd,
     do {
         int finished = 0;
         for (i = 0; i < buf->size; i++) {
-            if (DATA(buf)[i] == '\n') {
-                memcpy(dest + new_size, DATA(buf), i);
-                memmove(DATA(buf), DATA(buf) + i + 1, buf->size - i - 1);
+            if (buf->data[i] == '\n') {
+                if (new_size + i > size) {
+                    return -1;
+                }
+                memcpy(dest + new_size, buf->data, i);
+                memmove(buf->data, buf->data + i + 1, buf->size - i - 1);
                 buf->size -= i + 1;
                 new_size += i;
                 finished = 1;
@@ -123,7 +126,7 @@ ssize_t buf_getline(int fd,
         if (current < 0) {
             return -1;
         }
-        memcpy(dest + new_size, DATA(buf), buf->size);
+        memcpy(dest + new_size, buf->data, buf->size);
         new_size += buf->size;
         buf->size = 0;
     } while ((current = buf_fill(fd, buf, 1)));

@@ -27,7 +27,7 @@ char* process_lines(char* begin,
     for (; begin < end; begin = next_line + 1) {
         next_line = begin;
         while (next_line < end
-               && *next_line != '\n') {
+                && *next_line != '\n') {
             next_line++;
         }
 
@@ -97,7 +97,7 @@ int filter(char* buffer, void* data)
     local_buffer[buffer_len + 1] = 0;
 
     while (null_pos < process->max_length
-           && process->argv[null_pos] != NULL) {
+            && process->argv[null_pos] != NULL) {
 
         null_pos++;
     }
@@ -118,7 +118,7 @@ int filter(char* buffer, void* data)
         }
     }
 
- EXIT:
+EXIT:
     process->argv[null_pos] = NULL;
 
     return result;
@@ -152,7 +152,7 @@ int main(int argc,
 
     return EXIT_SUCCESS;
 
- ERROR:
+ERROR:
     perror("error");
     return EXIT_FAILURE;
 }

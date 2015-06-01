@@ -29,7 +29,7 @@ char* revwords(char* begin, char* end)
     for (; begin < end; begin = next_space + 1) {
         next_space = begin;
         while (next_space < end
-               && *next_space != ' ') {
+                && *next_space != ' ') {
             next_space++;
         }
 
@@ -79,7 +79,7 @@ int main()
 
     return EXIT_SUCCESS;
 
- ERROR:
+ERROR:
     perror("I/O error");
     return EXIT_FAILURE;
 }

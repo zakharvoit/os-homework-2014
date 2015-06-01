@@ -10,8 +10,8 @@ ssize_t read_(int fd,
     size_t already_read = 0;
 
     while (already_read < count) {
-        int new = read(fd, 
-                       (char*) buf + already_read, 
+        int new = read(fd,
+                       (char*) buf + already_read,
                        count - already_read);
 
         if (new < 0) {
@@ -56,8 +56,8 @@ ssize_t read_until(int fd,
     size_t i = 0;
 
     while (already_read < count) {
-        int new = read(fd, 
-                       (char*) buf + already_read, 
+        int new = read(fd,
+                       (char*) buf + already_read,
                        count - already_read);
 
         if (new < 0) {
