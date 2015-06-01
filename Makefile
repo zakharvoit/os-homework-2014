@@ -1,4 +1,5 @@
 SUBMODULES = lib cat revwords filter bufcat foreach
+export CFLAGS = -std=c11 -Wall -Wextra
 
 SUBMODULES_RULE = $(SUBMODULES:%=%.submodule)
 
