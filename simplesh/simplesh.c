@@ -1,6 +1,8 @@
 #include "helpers.h"
 #include "bufio.h"
 
+#include <signal.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -15,8 +17,16 @@ int print_prompt()
   return write_(STDOUT_FILENO, "$ ", 2);
 }
 
+static void signal_handler(int sig)
+{
+  (void)sig;
+  write_(STDOUT_FILENO, "\n", 1);
+  print_prompt();
+}
+
 int main()
 {
+  signal(SIGINT, signal_handler);
   int exit_code = EXIT_SUCCESS;
   struct buf_t* buf = buf_new(MAX_SIZE);
   char s[MAX_SIZE + 1];
@@ -72,7 +82,6 @@ int main()
       goto ERROR;
     }
 
-    
     if (print_prompt() < 0) {
       QUIT(EXIT_FAILURE);
     }

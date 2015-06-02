@@ -1,6 +1,8 @@
 #include "helpers.h"
 
+#include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -189,15 +191,55 @@ void execargs_free(execargs_t* args)
   free(args);
 }
 
+struct sigaction prev_handler;
+
+_Bool unexpected_exit = 0;
+int* running;
+int running_n;
+static void signal_handler(int sig)
+{
+  (void)sig;
+  unexpected_exit = 1;
+  for (int i = 0; i < running_n; i++) {
+    kill(running[i], SIGTERM);
+    waitpid(running[i], NULL, 0);
+  }
+}
+
+static int set_up_signals()
+{
+  unexpected_exit = 0;
+  struct sigaction kill_children;
+  kill_children.sa_handler = signal_handler;
+  kill_children.sa_flags = 0;
+  sigemptyset(&kill_children.sa_mask);
+  if (sigaction(SIGINT, &kill_children, &prev_handler) < 0) {
+    return -1;
+  }
+  return 0;
+}
+
+static int restore_signals()
+{
+  sigaction(SIGINT, &prev_handler, NULL);
+  return unexpected_exit;
+}
+
+#define QUIT(x) do { exit_code = x; goto EXIT; } while (0)
+
 int runpiped(execargs_t** programs, int n)
 {
+  int exit_code = 0;
   pid_t children[n];
+  running = children;
+  running_n = n;
+  set_up_signals();
   int input = STDIN_FILENO;
   int next_pipe[2];
 
   for (int i = 0; i < n; i++) {
-    if (i < n - 1 && pipe(next_pipe) < 0) {
-      return -1;
+    if (i < n - 1 && pipe2(next_pipe, O_CLOEXEC) < 0) {
+      QUIT(-1);
     } else if (i == n - 1) {
       next_pipe[1] = STDOUT_FILENO;
     }
@@ -214,22 +256,21 @@ int runpiped(execargs_t** programs, int n)
         if (next_pipe[1] != STDOUT_FILENO) {
           close(next_pipe[1]);
         }
-        return -1;
+        QUIT(-1);
       }
 
       if ((input != STDIN_FILENO && close(input) < 0)
           || (next_pipe[1] != STDOUT_FILENO && close(next_pipe[1]) < 0)) {
-        return -1;
+        QUIT(-1);
       }
 
       input = next_pipe[0];
     } else {
-      int output = next_pipe[1];
       if ((i != 0 && i < n - 1 && close(next_pipe[0]) < 0)
           || dup2(input, STDIN_FILENO) < 0
           || (input != STDIN_FILENO && close(input) < 0)
-          || dup2(output, STDOUT_FILENO) < 0
-          || (output != STDOUT_FILENO && close(output) < 0)
+          || dup2(next_pipe[1], STDOUT_FILENO) < 0
+          || (next_pipe[1] != STDOUT_FILENO && close(next_pipe[1]) < 0)
           || (execvp(programs[i][0], programs[i]) < 0)
           ) {
         _exit(EXIT_FAILURE);
@@ -243,9 +284,14 @@ int runpiped(execargs_t** programs, int n)
     int status;
     waitpid(children[i], &status, 0);
     if (WEXITSTATUS(status)) {
-      return -1;
+      QUIT(-1);
     }
   }
 
-  return 0;
+ EXIT:
+  if (restore_signals() < 0) {
+    return -1;
+  }
+
+  return exit_code;
 }

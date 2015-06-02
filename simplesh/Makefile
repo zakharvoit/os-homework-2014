@@ -1,6 +1,6 @@
 LIBHELPERS_PATH = ../lib
 
-CFLAGS = -g -std=c11 -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
+CFLAGS = -D_GNU_SOURCE -D_POSIX_SOURCE -g -std=c11 -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
 LDFLAGS =  -L$(LIBHELPERS_PATH) -Wl,-rpath=$(LIBHELPERS_PATH)
 LDLIBS = -lhelpers -lbufio
 

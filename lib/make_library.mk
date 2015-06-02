@@ -1,7 +1,7 @@
 ifeq ($(TARGET), debug)
-CFLAGS = -std=c11 -DDEBUG -fPIC -O0 -g -Wall -Wextra
+CFLAGS = -D_GNU_SOURCE -D_POSIX_SOURCE -std=c11 -DDEBUG -fPIC -O0 -g -Wall -Wextra
 else
-CFLAGS = -std=c11 -fPIC -O2 -Wall -Wextra
+CFLAGS = -D_GNU_SOURCE -D_POSIX_SOURCE -std=c11 -fPIC -O2 -Wall -Wextra
 endif
 
 LIB = lib$(NAME).so
