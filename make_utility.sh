@@ -15,4 +15,5 @@ int main(int argc, char** argv)
   return 0;
 }
 EOF
-sed "s/foreach/$1/g" foreach/Makefile >$1/Makefile
+sed "s/filesender/$1/g" filesender/Makefile >$1/Makefile
+sed "s/filesender/$1/g" filesender/.gitignore >$1/.gitignore
