@@ -1,0 +1,1 @@
+forking.o: forking.c ../lib/helpers.h ../lib/bufio.h
