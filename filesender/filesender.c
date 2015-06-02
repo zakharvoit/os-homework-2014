@@ -13,7 +13,11 @@
 #include <helpers.h>
 #include <bufio.h>
 
+#ifdef DEBUG
 #define LOG(args...) fprintf(stderr, args)
+#else
+#define LOG(args...)
+#endif
 #define FAIL(args...) do { fprintf(stderr, args); exit(1); cleanup(); } while (0)
 
 static char* port_number;
@@ -50,7 +54,10 @@ static void parse_address_info(void)
   struct addrinfo hints;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
-  int err = getaddrinfo("localhost", port_number, NULL, &info);
+  hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+  int err = getaddrinfo("localhost", port_number, &hints, &info);
   if (err) {
     FAIL("Getaddrinfo: %s\n", gai_strerror(err));
   }
@@ -127,9 +134,6 @@ static void main_loop(void)
   while ((client = accept(server, NULL, NULL)) > 0) {
     LOG("Accepted %d\n", client);
     process_client(client);
-  }
-  if (errno == EINVAL) {
-    fprintf(stderr, "INVAL Received\n");
   }
   FAIL("Accept: %s\n", strerror(errno));
 }

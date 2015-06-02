@@ -13,7 +13,11 @@
 #include <helpers.h>
 #include <bufio.h>
 
+#ifdef DEBUG
 #define LOG(args...) fprintf(stderr, args)
+#else
+#define LOG(args...)
+#endif
 #define FAIL(args...) do { fprintf(stderr, args); exit(1); cleanup(); } while (0)
 
 typedef struct
@@ -71,7 +75,14 @@ static void parse_args(int argc, char** argv)
 
 static void parse_address_info(serv_info* server)
 {
-  int err = getaddrinfo("localhost", server->port_number, NULL, &(server->info));
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+  int err = getaddrinfo("localhost", server->port_number,
+                        &hints,
+                        &(server->info));
   if (err) {
     FAIL("Getaddrinfo: %s\n", gai_strerror(err));
   }
@@ -80,9 +91,6 @@ static void parse_address_info(serv_info* server)
 static void create_server(serv_info* server)
 {
   parse_address_info(server);
-  int sock = socket(server->info->ai_family,
-                    server->info->ai_socktype,
-                    server->info->ai_protocol);
   int family = server->info->ai_family;
   if (family == AF_INET6) {
     LOG("Using IPv6\n");
@@ -91,6 +99,10 @@ static void create_server(serv_info* server)
   } else {
     FAIL("Unknown family: %d\n", family);
   }
+
+  int sock = socket(server->info->ai_family,
+                    server->info->ai_socktype,
+                    server->info->ai_protocol);
   if (sock < 0) {
     FAIL("Socket: %s\n", strerror(errno));
   }
@@ -168,15 +180,9 @@ static void main_loop(void)
     LOG("Waiting for the right hand client\n");
     int right = accept(second.fd, NULL, NULL);
     if (right < 0) {
-      if (errno == EINVAL) {
-        fprintf(stderr, "INVALINVALINVAL\n");
         FAIL("Accept right: %s\n", strerror(errno));
-      }
     }
     process_clients(client, right);
-  }
-  if (errno == EINVAL) {
-    fprintf(stderr, "INVAL Received\n");
   }
   FAIL("Accept: %s\n", strerror(errno));
 }
