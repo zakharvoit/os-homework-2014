@@ -3,10 +3,10 @@ all: libbufio.so libhelpers.so
 MAKE = @make --no-print-directory
 
 BUFIO_SRC = bufio.c
-MAKE_BUFIO = $(MAKE) SRC=$(BUFIO_SRC) NAME=bufio -f make_library.mk
+MAKE_BUFIO = $(MAKE) SRC="$(BUFIO_SRC)" NAME=bufio -f make_library.mk
 
-HELPERS_SRC = helpers.c
-MAKE_HELPERS = $(MAKE) SRC=$(HELPERS_SRC) NAME=helpers -f make_library.mk
+HELPERS_SRC = helpers.c util.c
+MAKE_HELPERS = $(MAKE) SRC="$(HELPERS_SRC)" NAME=helpers -f make_library.mk
 
 libbufio.so:
 	$(MAKE_BUFIO)
