@@ -117,6 +117,7 @@ static nfds_t add_fd(int fd, int mask)
 
 static void remove_fd(int pos)
 {
+  close(fds[pos].fd);
   fds[pos] = fds[--size];
 }
 
@@ -137,7 +138,7 @@ static void parse_address_info(serv_info* server)
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = IPPROTO_TCP;
-  int err = getaddrinfo("localhost", server->port_number,
+  int err = getaddrinfo("0.0.0.0", server->port_number,
                         &hints,
                         &(server->info));
   if (err) {
