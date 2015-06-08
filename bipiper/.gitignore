@@ -1,4 +1,5 @@
 forking
 polling
 .depend
+.clang_complete
 *.o

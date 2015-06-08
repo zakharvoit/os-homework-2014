@@ -1,7 +1,7 @@
 LIBHELPERS_PATH = ../lib
 
 ifeq ($(TARGET), debug)
-CFLAGS = -D_GNU_SOURCE -D_POSIX_SOURCE -std=c11 -g -O0 -D_GLIBC_DEBUG -Wall -Wextra -I$(LIBHELPERS_PATH)
+CFLAGS = -D_GNU_SOURCE -D_POSIX_SOURCE -std=c11 -g -O0 -DDEBUG -D_GLIBC_DEBUG -Wall -Wextra -I$(LIBHELPERS_PATH)
 else
 CFLAGS = -D_GNU_SOURCE -D_POSIX_SOURCE -std=c11 -O2 -Wall -Wextra -I$(LIBHELPERS_PATH)
 endif
@@ -9,16 +9,18 @@ endif
 LDFLAGS = -Wl,-rpath=$(LIBHELPERS_PATH) -L$(LIBHELPERS_PATH)
 LDLIBS = -lhelpers -lbufio
 
-OUTPUT = forking
-OBJ = forking.o
-SRC = $(OBJ:%.o=%.c)
+FORKING = forking
+FORKING_OBJ = forking.o
+POLLING = polling
+POLLING_OBJ = polling.o
+SRC = $(FORKING_OBJ:%.o=%.c) $(POLLING_OBJ:%.o=%.c)
 
-all: depend $(OUTPUT)
+all: depend $(FORKING) $(POLLING)
 
 test:
 	./test.sh
 
-$(OUTPUT): $(OBJ)
+$(FORKING): $(FORKING_OBJ)
 
 depend: .depend
 
@@ -29,7 +31,7 @@ depend: .depend
 -include .depend
 
 clean:
-	-rm -f $(OUTPUT) $(OBJ)
+	-rm -f $(FORKING) $(POLLING) $(FORKING_OBJ) $(POLLING_OBJ)
 	-rm -f .depend
 
 .PHONY: all clean depend test

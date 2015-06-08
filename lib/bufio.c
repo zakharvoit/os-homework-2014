@@ -40,6 +40,24 @@ size_t buf_size(struct buf_t* buffer)
     return buffer->size;
 }
 
+void buf_clear(struct buf_t* buf)
+{
+  assert(buf);
+  buf->size = 0;
+}
+
+_Bool buf_empty(struct buf_t* buf)
+{
+  assert(buf);
+  return buf->size == 0;
+}
+
+_Bool buf_full(struct buf_t* buf)
+{
+  assert(buf);
+  return buf->size == buf->capacity;
+}
+
 ssize_t buf_fill(int fd,
                  struct buf_t* buf,
                  size_t required)
@@ -74,12 +92,17 @@ ssize_t buf_flush(int fd,
     ssize_t current = 0;
     size_t written = 0;
 
-    while ((current = write(fd,
+    while (buf->size > written &&
+           (current = write(fd,
                             buf->data + written,
                             buf->size - written))) {
         if (current < 0) {
             /* Buffer state undefined ? */
             return -1;
+        }
+
+        if (current == 0) {
+          return BUFIO_EOF;
         }
 
         written += current;
