@@ -12,7 +12,7 @@ LDLIBS = -lhelpers -lbufio
 FORKING = forking
 FORKING_OBJ = forking.o
 POLLING = polling
-POLLING_OBJ = polling.o
+POLLING_OBJ = polling.o poller.o
 SRC = $(FORKING_OBJ:%.o=%.c) $(POLLING_OBJ:%.o=%.c)
 
 all: depend $(FORKING) $(POLLING)
@@ -21,6 +21,7 @@ test:
 	./test.sh
 
 $(FORKING): $(FORKING_OBJ)
+$(POLLING): $(POLLING_OBJ)
 
 depend: .depend
 
